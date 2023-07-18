@@ -16,8 +16,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class EditUserTest extends BaseTest {
 
     BaseService baseService = new BaseService();
-    private final static String CREATE_BY_SUPERVISOR = "/create/supervisor/";
-    private final static String EDIT_BY_USER = "/update/user/";
 
     @Test
     @DisplayName("Change 'user' age by user")
@@ -74,11 +72,13 @@ public class EditUserTest extends BaseTest {
     }
 
     public Response send(RequestModel rq) {
+        String CREATE_BY_SUPERVISOR = "/create/supervisor/";
         return baseService.given().queryParams((rq.toMap()))
                 .get(CREATE_BY_SUPERVISOR);
     }
 
     public Response send(PatchReq rq, int userId) {
+        String EDIT_BY_USER = "/update/user/";
         return baseService.given().body(rq)
                 .patch(EDIT_BY_USER + userId);
     }

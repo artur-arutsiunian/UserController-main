@@ -16,7 +16,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class CreateSupervisorTest extends BaseTest {
 
     BaseService baseService = new BaseService();
-    private final static String CREATE_BY_SUPERVISOR = "/create/supervisor";
 
     @Test
     @DisplayName("Check user creation")
@@ -137,6 +136,7 @@ public class CreateSupervisorTest extends BaseTest {
     }
 
     public Response send(RequestModel rq) {
+        String CREATE_BY_SUPERVISOR = "/create/supervisor";
         return baseService.given().queryParams((rq.toMap()))
                 .get(CREATE_BY_SUPERVISOR);
     }

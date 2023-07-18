@@ -15,8 +15,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class GetUserTest extends BaseTest {
 
     BaseService baseService = new BaseService();
-    private final static String CREATE_BY_SUPERVISOR = "/create/supervisor/";
-    private final static String GET_BY_SUPERVISOR = "/get";
 
     @Test
     @DisplayName("Receive user with correct id")
@@ -67,11 +65,13 @@ public class GetUserTest extends BaseTest {
     }
 
     public Response send(RequestModel rq) {
+        String CREATE_BY_SUPERVISOR = "/create/supervisor/";
         return baseService.given().queryParams((rq.toMap()))
                 .get(CREATE_BY_SUPERVISOR);
     }
 
     public Response send(GetReq gr) {
+        String GET_BY_SUPERVISOR = "/get";
         return baseService.given().body(gr)
                 .post(GET_BY_SUPERVISOR);
     }

@@ -15,7 +15,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class CreateAdminTest extends BaseTest{
 
     BaseService baseService = new BaseService();
-    private final static String CREATE_BY_ADMIN = "/create/admin";
 
     @Test
     @DisplayName("Send wrong user role who can't be created")
@@ -64,6 +63,7 @@ public class CreateAdminTest extends BaseTest{
         return getCreatePlayerParamsMap("17", Gender.male, "User5", "1234567", role,"Use3");
     }
     public Response send(RequestModel rq) {
+        String CREATE_BY_ADMIN = "/create/admin";
         return baseService.given().queryParams((rq.toMap()))
                 .get(CREATE_BY_ADMIN);
     }

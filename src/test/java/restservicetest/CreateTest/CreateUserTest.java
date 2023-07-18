@@ -14,7 +14,6 @@ import restservicetest.BaseTest;
 
 public class CreateUserTest extends BaseTest {
     BaseService baseService = new BaseService();
-    private final static String CREATE_BY_USER = "/create/user";
 
     @Test
     @DisplayName("Send wrong user role who can't be created")
@@ -58,6 +57,7 @@ public class CreateUserTest extends BaseTest {
         return getCreatePlayerParamsMap("17", Gender.male, "User5", "1234567", role,"Use3");
     }
     public Response send(RequestModel rq) {
+        String CREATE_BY_USER = "/create/user";
         return baseService.given().queryParams((rq.toMap()))
                 .get(CREATE_BY_USER);
     }

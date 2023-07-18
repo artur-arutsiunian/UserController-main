@@ -13,8 +13,6 @@ import restservicetest.BaseTest;
 public class DeleteUserTest extends BaseTest {
 
     BaseService baseService = new BaseService();
-    private final static String CREATE_BY_SUPERVISOR = "/create/supervisor/";
-    private final static String DELETE_BY_USER = "/delete/user/";
 
     @Test
     @DisplayName("Remove user by role 'user'")
@@ -68,11 +66,13 @@ public class DeleteUserTest extends BaseTest {
     }
 
     public Response send(RequestModel rq) {
+        String CREATE_BY_SUPERVISOR = "/create/supervisor/";
         return baseService.given().queryParams((rq.toMap()))
                 .get(CREATE_BY_SUPERVISOR);
     }
 
     public Response send(DeleteReq dl) {
+        String DELETE_BY_USER = "/delete/user/";
         return baseService.given().body(dl)
                 .delete(DELETE_BY_USER);
     }
