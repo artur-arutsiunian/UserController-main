@@ -42,8 +42,4 @@ public class AssertionsHelper {
     public static void assertStatusCodeNoContent(Response r, int code) {
         assertEquals(code, r.statusCode(), ErrorMsgsContainer.STATUS_CODES);
     }
-
-    public static void assertNotNullAndNotEmpty(Object o, String itemName) {
-     Assertions.assertTrue(BooleanHelper.isNotNullAndNotBlank(o), ErrorMsgsContainer.getNullOrEmptyMsg(itemName));
-    }
 }
