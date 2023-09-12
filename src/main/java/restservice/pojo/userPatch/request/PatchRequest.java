@@ -4,31 +4,32 @@ public class PatchRequest {
 
     private Integer age;
 
+    private PatchRequest(Builder builder) {
+        this.age = builder.age;
+    }
+
     public Integer getAge() {
         return age;
     }
 
+    @Override
+    public String toString() {
+        return "PatchRequest{" +
+                "age=" + age +
+                '}';
+    }
+
     public static class Builder {
-        private PatchRequest newPatchRequest;
 
-        public Builder() {
-            newPatchRequest = new PatchRequest();
-        }
+        private Integer age;
 
-        public Builder age(Integer age) {
-            newPatchRequest.age = age;
+        public Builder buildPlayerAge(Integer age) {
+            this.age = age;
             return this;
         }
 
-        public PatchRequest build(){
-            return newPatchRequest;
-        }
-
-        @Override
-        public String toString() {
-            return "Builder{" +
-                    "newPatchRequest=" + newPatchRequest +
-                    '}';
+        public PatchRequest build() {
+            return new PatchRequest(this);
         }
     }
 }

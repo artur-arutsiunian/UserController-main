@@ -4,122 +4,149 @@ import io.qameta.allure.Description;
 import io.qameta.allure.Severity;
 import io.qameta.allure.SeverityLevel;
 import io.restassured.response.Response;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import restservice.RequestService;
 import restservice.helpers.AssertionsHelper;
 import restservice.pojo.userCreate.request.CreateRequest;
 import restservice.pojo.userCreate.response.CreateResponse;
-import restservice.pojo.userCreate.response.CreateResponseDto;
 
-import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class CreateSupervisorTest extends RequestService {
+public class CreateSupervisorTest {
+
+    private RequestService requestService = RequestService.getInstance();
+    CreateRequest createReq = new CreateRequest.Builder()
+            .buildAge("17")
+            .buildGender("male")
+            .buildLogin("user5")
+            .buildPassword("1234567")
+            .buildRole("user")
+            .buildScreenName("Use3")
+            .build();
+
     @Test
     @DisplayName("Check user creation")
     @Description("Check that user creates with all necessary fields and values")
     @Severity(value = SeverityLevel.BLOCKER)
-    void createUserPositiveTest() {
+    public void createUserPositiveTest() {
         CreateRequest rCP = new CreateRequest.Builder()
-                .roleOnly("admin", createReq)
+                .request(createReq)
+                .buildRole("admin")
                 .build();
-        Response respCP = send(rCP, "/create/supervisor");
-        AssertionsHelper.assertStatusCodeAndContentType(respCP);
-        CreateResponseDto actualResp = new CreateResponseDto(respCP.as(CreateResponse.class));
-        CreateResponseDto expectedResp = new CreateResponseDto(List.of(new CreateResponseDto.Files(17, "male", "User5", "1234567", "user", "Use3")));
+        Response respCP = requestService.send(rCP, "supervisor");
+        AssertionsHelper.assertStatusCodeOKAndContentTypeOK(respCP);
+        CreateResponse actualResp = respCP.as(CreateResponse.class);
+        CreateResponse expectedResp = rCP.toCreateResponse();
+        expectedResp.setId(respCP.jsonPath().get("id"));
         assertEquals(expectedResp, actualResp, "Fields aren't equal");
     }
 
     @Test
     @DisplayName("Send wrong age field")
     @Description("Send wrong user age")
-    void verifyingAgeNegativeTest() {
+    public void verifyingAgeNegativeTest() {
         CreateRequest rCP = new CreateRequest.Builder()
-                .ageOnly("60", createReq)
+                .request(createReq)
+                .buildAge("60")
                 .build();
-        Response respCP = send(rCP, "/create/supervisor");
+        Response respCP = requestService.send(rCP, "supervisor");
         AssertionsHelper.assertStatusCodeBadRequestNegative(respCP);
+
+        String responseBody = respCP.asString();
+        Assertions.assertTrue(responseBody.isEmpty(), "Response body should be empty.");
     }
 
     @Test
     @DisplayName(("Send wrong password field"))
     @Description("Send wrong user password")
-    void verifyingPasswordNegativeTest() {
+    public void verifyingPasswordNegativeTest() {
         CreateRequest rCP = new CreateRequest.Builder()
-                .passwordOnly("123456", createReq)
+                .request(createReq)
+                .buildPassword("123456")
                 .build();
-        Response respCP = send(rCP, "/create/supervisor");
+        Response respCP = requestService.send(rCP, "supervisor");
         AssertionsHelper.assertStatusCodeBadRequestNegative(respCP);
+
+        String responseBody = respCP.asString();
+        Assertions.assertTrue(responseBody.isEmpty(), "Response body should be empty.");
     }
 
     @Test
     @DisplayName("Send 'user' role who can be created")
     @Description("Send 'user' role who can be created")
-    void verifyingRoleUserPositiveTest(){
+    public void verifyingRoleUserPositiveTest(){
         CreateRequest rCP = new CreateRequest.Builder()
-                .roleOnly("user", createReq)
+                .request(createReq)
+                .buildRole("user")
                 .build();
-        Response respCP = send(rCP, "/create/supervisor");
-        AssertionsHelper.assertStatusCodeAndContentType(respCP);
-        CreateResponseDto actualResp = new CreateResponseDto(respCP.as(CreateResponse.class));
-        CreateResponseDto expectedResp = new CreateResponseDto(List.of(new CreateResponseDto.Files(17, "male", "User5", "1234567", "user", "Use3")));
+        Response respCP = requestService.send(rCP, "supervisor");
+        AssertionsHelper.assertStatusCodeOKAndContentTypeOK(respCP);
+        CreateResponse actualResp = respCP.as(CreateResponse.class);
+        CreateResponse expectedResp = rCP.toCreateResponse();
+        expectedResp.setId(respCP.jsonPath().get("id"));
         assertEquals(expectedResp, actualResp, "Fields aren't equal");
     }
 
     @Test
     @DisplayName("Send 'supervisor' role who can't be created")
     @Description("Send 'supervisor' role who can't be created")
-    void verifyingRoleSupervisorNegativeTest(){
+    public void verifyingRoleSupervisorNegativeTest(){
         CreateRequest rCP = new CreateRequest.Builder()
-                .roleOnly("supervisor", createReq)
+                .request(createReq)
+                .buildRole("supervisor")
                 .build();
-        Response respCP = send(rCP, "/create/supervisor");
+        Response respCP = requestService.send(rCP, "supervisor");
         AssertionsHelper.assertStatusCodeBadRequestNegative(respCP);
+
+        String responseBody = respCP.asString();
+        Assertions.assertTrue(responseBody.isEmpty(), "Response body should be empty.");
     }
 
     @Test
     @DisplayName("Send 'login' which was already used")
     @Description("Send 'login' field which was used before")
-    void verifyingUniqueLoginFieldNegativeTest(){
+    public void verifyingUniqueLoginFieldNegativeTest(){
         CreateRequest rCP = new CreateRequest.Builder()
-                .loginOnly("user5", createReq)
+                .request(createReq)
+                .buildLogin("user5")
                 .build();
-        Response respCP = send(rCP, "/create/supervisor");
+        Response respCP = requestService.send(rCP, "supervisor");
         AssertionsHelper.assertStatusCodeBadRequestNegative(respCP);
+
+        String responseBody = respCP.asString();
+        Assertions.assertTrue(responseBody.isEmpty(), "Response body should be empty.");
     }
 
     @Test
     @DisplayName("Send 'screenName' which was already used")
     @Description("Send 'screenName' field which was used before")
-    void verifyingUniqueScreenNameFieldNegative(){
+    public void verifyingUniqueScreenNameFieldNegative(){
         CreateRequest rCP = new CreateRequest.Builder()
-                .screenNameOnly("Use3", createReq)
+                .request(createReq)
+                .buildScreenName("Use3")
                 .build();
-        Response respCP = send(rCP, "/create/supervisor");
+        Response respCP = requestService.send(rCP, "supervisor");
         AssertionsHelper.assertStatusCodeBadRequestNegative(respCP);
+
+        String responseBody = respCP.asString();
+        Assertions.assertTrue(responseBody.isEmpty(), "Response body should be empty.");
     }
 
     @Test
     @DisplayName("Send another correct user gender")
     @Description("Send another correct option gender of user")
-    void verifyingGenderFieldPositive(){
+    public void verifyingGenderFieldPositive(){
         CreateRequest rCP = new CreateRequest.Builder()
-                .genderOnly("female", createReq)
+                .request(createReq)
+                .buildGender("female")
                 .build();
-        Response respCP = send(rCP, "/create/supervisor");
-        AssertionsHelper.assertStatusCodeAndContentType(respCP);
-        CreateResponseDto actualResp = new CreateResponseDto(respCP.as(CreateResponse.class));
-        CreateResponseDto expectedResp = new CreateResponseDto(List.of(new CreateResponseDto.Files(17, "female", "User5", "1234567", "user", "Use3")));
+        Response respCP = requestService.send(rCP, "supervisor");
+        AssertionsHelper.assertStatusCodeOKAndContentTypeOK(respCP);
+        CreateResponse actualResp = respCP.as(CreateResponse.class);
+        CreateResponse expectedResp = rCP.toCreateResponse();
+        expectedResp.setId(respCP.jsonPath().get("id"));
         assertEquals(expectedResp, actualResp, "Fields aren't equal");
     }
-
-    CreateRequest createReq = new CreateRequest.Builder()
-            .age("17")
-            .gender("male")
-            .login("User5")
-            .password("1234567")
-            .role("user")
-            .screenName("Use3")
-            .build();
 }

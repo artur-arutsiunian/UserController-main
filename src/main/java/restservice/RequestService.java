@@ -14,6 +14,12 @@ import restservice.pojo.userPatch.request.PatchRequest;
 
 public class RequestService {
 
+    private static RequestService instance = new RequestService();
+
+    public static RequestService getInstance() {
+        return instance;
+    }
+
     public RequestSpecification given() {
         return RestAssured.given()
                 .baseUri("http://3.68.165.45")
@@ -23,23 +29,23 @@ public class RequestService {
                 .relaxedHTTPSValidation();
     }
 
-    public Response send(RequestModel rq, String endpoint) {
+    public Response send(RequestModel rq, String role) {
         return given().queryParams((rq.toMap()))
-                .get(endpoint);
+                .get("/create/" + role);
     }
 
-    public Response send(PatchRequest rq, String endpoint, int userId) {
+    public Response send(PatchRequest rq, String role, int userId) {
         return given().body(rq)
-                .patch(endpoint + userId);
+                .patch("/update/" + role + userId);
     }
 
-    public Response send(DeleteRequest dl, String endpoint) {
+    public Response send(DeleteRequest dl, String role) {
         return given().body(dl)
-                .delete(endpoint);
+                .delete("/delete/" + role);
     }
 
-    public Response send(GetRequest gr, String endpoint) {
+    public Response send(GetRequest gr) {
         return given().body(gr)
-                .post(endpoint);
+                .post("/get");
     }
 }

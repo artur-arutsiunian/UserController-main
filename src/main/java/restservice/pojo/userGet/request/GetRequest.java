@@ -1,34 +1,42 @@
 package restservice.pojo.userGet.request;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import restservice.pojo.userGet.response.GetResponse;
+
+import java.util.Map;
+
 public class GetRequest {
 
     private Integer playerId;
+
+    private GetRequest(Builder builder) {
+        this.playerId = builder.playerId;
+    }
 
     public Integer getPlayerId() {
         return playerId;
     }
 
+    @Override
+    public String toString() {
+        return "GetRequest{" +
+                "playerId=" + playerId +
+                '}';
+    }
+
     public static class Builder {
-        private GetRequest newGetRequest;
 
-        public Builder() {
-            newGetRequest = new GetRequest();
-        }
+        private Integer playerId;
 
-        public GetRequest.Builder playerId(Integer playerId) {
-            newGetRequest.playerId = playerId;
+        public Builder buildPlayerId(Integer playerId) {
+            this.playerId = playerId;
             return this;
         }
 
         public GetRequest build() {
-            return newGetRequest;
-        }
-
-        @Override
-        public String toString() {
-            return "Builder{" +
-                    "newGetRequest=" + newGetRequest +
-                    '}';
+            return new GetRequest(this);
         }
     }
 }

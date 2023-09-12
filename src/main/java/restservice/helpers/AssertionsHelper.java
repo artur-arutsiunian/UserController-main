@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Assertions;
 
 public class AssertionsHelper {
 
-    public static void assertStatusCodeAndContentType(Response r) {
+    public static void assertStatusCodeOKAndContentTypeOK(Response r) {
         assertStatusCodeAndContentType(r, HttpStatus.SC_OK,  ContentType.JSON);
     }
 

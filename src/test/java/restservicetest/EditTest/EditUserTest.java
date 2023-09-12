@@ -2,6 +2,7 @@ package restservicetest.EditTest;
 
 import io.qameta.allure.Description;
 import io.restassured.response.Response;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import restservice.RequestService;
@@ -13,54 +14,64 @@ import restservice.pojo.userPatch.response.PatchResponse;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class EditUserTest extends RequestService {
+public class EditUserTest {
+
+    private RequestService requestService = RequestService.getInstance();
+
+    CreateRequest createReq = new CreateRequest.Builder()
+            .buildAge("17")
+            .buildGender("male")
+            .buildLogin("user5")
+            .buildPassword("1234567")
+            .buildScreenName("Use3")
+            .build();
 
     @Test
     @DisplayName("Change 'user' age by user")
     @Description("Change 'user' age by user")
-    void editUserAgeByUserPositiveTest(){
+    public void editUserAgeByUserPositiveTest(){
         CreateRequest rCP = new CreateRequest.Builder()
-                .roleOnly("user", createReq)
+                .request(createReq)
+                .buildRole("user")
                 .build();
-        Response respCP = send(rCP, "/create/supervisor");
-        AssertionsHelper.assertStatusCodeAndContentType(respCP);
+        Response respCP = requestService.send(rCP, "supervisor");
+        AssertionsHelper.assertStatusCodeOKAndContentTypeOK(respCP);
 
         int id = respCP.as(CreateResponse.class).getId();
 
         PatchRequest pCP = new PatchRequest.Builder()
-                .age(25)
+                .buildPlayerAge(25)
                 .build();
-        Response respPS = send(pCP,"/update/user/", id);
-        AssertionsHelper.assertStatusCodeAndContentType(respPS);
+        Response respPS = requestService.send(pCP,"user/", id);
+        AssertionsHelper.assertStatusCodeOKAndContentTypeOK(respPS);
         PatchResponse actualResp = respPS.as(PatchResponse.class);
-        PatchResponse expectedResp = new PatchResponse(25, "male", id, "User5", "user","Use3");
-        assertEquals(expectedResp, actualResp, "'Age' fields isn't equal");
+        assertEquals(pCP.getAge(), actualResp.getAge(), "'Age' fields aren't equal");
+        assertEquals(rCP.getGender(), actualResp.getGender(), "'Gender' fields aren't equal");
+        assertEquals(rCP.getLogin(), actualResp.getLogin(), "'Login' fields aren't equal");
+        assertEquals(rCP.getRole(), actualResp.getRole(), "'Role' fields aren't equal");
+        assertEquals(rCP.getScreenName(), actualResp.getScreenName(), "'ScreenName' fields aren't equal");
     }
 
     @Test
     @DisplayName("Change 'admin' age by user'")
     @Description("Change 'admin' age by user'")
-    void editAdminAgeByUserNegativeTest(){
+    public void editAdminAgeByUserNegativeTest(){
         CreateRequest rCP = new CreateRequest.Builder()
-                .roleOnly("admin", createReq)
+                .request(createReq)
+                .buildRole("admin")
                 .build();
-        Response respCP = send(rCP, "/create/supervisor");
-        AssertionsHelper.assertStatusCodeAndContentType(respCP);
+        Response respCP = requestService.send(rCP, "supervisor");
+        AssertionsHelper.assertStatusCodeOKAndContentTypeOK(respCP);
 
         int id = respCP.as(CreateResponse.class).getId();
 
         PatchRequest pCP = new PatchRequest.Builder()
-                .age(25)
+                .buildPlayerAge(25)
                 .build();
-        Response respPS = send(pCP,"/update/user/", id);
+        Response respPS = requestService.send(pCP,"user/", id);
         AssertionsHelper.assertStatusCodeForbiddenNegative(respPS);
-    }
 
-    CreateRequest createReq = new CreateRequest.Builder()
-            .age("17")
-            .gender("male")
-            .login("User5")
-            .password("1234567")
-            .screenName("Use3")
-            .build();
+        String responseBody = respPS.asString();
+        Assertions.assertTrue(responseBody.isEmpty(), "Response body should be empty.");
+    }
 }

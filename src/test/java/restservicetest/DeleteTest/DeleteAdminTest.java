@@ -2,6 +2,7 @@ package restservicetest.DeleteTest;
 
 import io.qameta.allure.Description;
 import io.restassured.response.Response;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import restservice.RequestService;
@@ -10,51 +11,61 @@ import restservice.pojo.userCreate.request.CreateRequest;
 import restservice.pojo.userCreate.response.CreateResponse;
 import restservice.pojo.userDelete.DeleteRequest;
 
-public class DeleteAdminTest extends RequestService {
+public class DeleteAdminTest  {
+
+    private RequestService requestService = RequestService.getInstance();
+
+    CreateRequest createReq = new CreateRequest.Builder()
+            .buildAge("17")
+            .buildGender("male")
+            .buildLogin("user5")
+            .buildPassword("1234567")
+            .buildScreenName("Use3")
+            .build();
 
     @Test
     @DisplayName("Remove user by role 'admin'")
     @Description("Remove user by role 'admin'")
-    void deleteUserByAdminPositiveTest(){
+    public void deleteUserByAdminPositiveTest(){
         CreateRequest rCP = new CreateRequest.Builder()
-                .roleOnly("user", createReq)
+                .request(createReq)
+                .buildRole("user")
                 .build();
-        Response respCP = send(rCP, "/create/supervisor");
-        AssertionsHelper.assertStatusCodeAndContentType(respCP);
+        Response respCP = requestService.send(rCP, "supervisor");
+        AssertionsHelper.assertStatusCodeOKAndContentTypeOK(respCP);
 
         int id = respCP.as(CreateResponse.class).getId();
 
         DeleteRequest pCP = new DeleteRequest.Builder()
-                .playerId(id)
+                .buildPlayerId(id)
                 .build();
-        Response respPS = send(pCP, "/delete/admin/");
+        Response respPS = requestService.send(pCP, "admin");
         AssertionsHelper.assertStatusCodeNoContent(respPS);
+
+        String responseBody = respPS.asString();
+        Assertions.assertTrue(responseBody.isEmpty(), "Response body should be empty.");
     }
 
     @Test
     @DisplayName("Remove admin by role 'admin'")
     @Description("Remove admin by role 'admin'")
-    void deleteAdminByAdminPositiveTest(){
+    public void deleteAdminByAdminPositiveTest(){
         CreateRequest rCP = new CreateRequest.Builder()
-                .roleOnly("admin", createReq)
+                .request(createReq)
+                .buildRole("admin")
                 .build();
-        Response respCP = send(rCP, "/create/supervisor");
-        AssertionsHelper.assertStatusCodeAndContentType(respCP);
+        Response respCP = requestService.send(rCP, "supervisor");
+        AssertionsHelper.assertStatusCodeOKAndContentTypeOK(respCP);
 
         int id = respCP.as(CreateResponse.class).getId();
 
         DeleteRequest pCP = new DeleteRequest.Builder()
-                .playerId(id)
+                .buildPlayerId(id)
                 .build();
-        Response respPS = send(pCP, "/delete/admin/");
+        Response respPS = requestService.send(pCP, "admin");
         AssertionsHelper.assertStatusCodeNoContent(respPS);
-    }
 
-    CreateRequest createReq = new CreateRequest.Builder()
-            .age("17")
-            .gender("male")
-            .login("user5")
-            .password("1234567")
-            .screenName("Use3")
-            .build();
+        String responseBody = respPS.asString();
+        Assertions.assertTrue(responseBody.isEmpty(), "Response body should be empty.");
+    }
 }

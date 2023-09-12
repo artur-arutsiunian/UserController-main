@@ -1,33 +1,37 @@
 package restservice.pojo.userDelete;
 
+import java.util.Objects;
+
 public class DeleteRequest {
 
     private Integer playerId;
+
+    private DeleteRequest(Builder builder) {
+        this.playerId = builder.playerId;
+    }
 
     public Integer getPlayerId() {
         return playerId;
     }
 
-    public static class Builder {
-        private DeleteRequest newDeleteRequest;
-        public Builder() {
-            newDeleteRequest = new DeleteRequest();
-        }
+    @Override
+    public String toString() {
+        return "DeleteRequest{" +
+                "playerId=" + playerId +
+                '}';
+    }
 
-        public DeleteRequest.Builder playerId(Integer playerId) {
-            newDeleteRequest.playerId = playerId;
+    public static class Builder {
+
+        private Integer playerId;
+
+        public Builder buildPlayerId(Integer playerId) {
+            this.playerId = playerId;
             return this;
         }
 
         public DeleteRequest build() {
-            return newDeleteRequest;
-        }
-
-        @Override
-        public String toString() {
-            return "Builder{" +
-                    "newDeleteRequest=" + newDeleteRequest +
-                    '}';
+            return new DeleteRequest(this);
         }
     }
 }

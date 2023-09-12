@@ -2,6 +2,7 @@ package restservicetest;
 
 import io.qameta.allure.Description;
 import io.restassured.response.Response;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import restservice.RequestService;
@@ -13,46 +14,53 @@ import restservice.pojo.userGet.response.GetResponse;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class GetUserTest extends RequestService {
+public class GetUserTest {
+
+    private RequestService requestService = RequestService.getInstance();
+
+    CreateRequest createReq = new CreateRequest.Builder()
+            .buildAge("17")
+            .buildGender("male")
+            .buildLogin("User5")
+            .buildPassword("1234567")
+            .buildScreenName("Use3")
+            .build();
 
     @Test
     @DisplayName("Receive user with correct id")
     @Description("Get a specific user by id")
-    void getUserPositiveTest() {
+    public void getUserPositiveTest() {
         CreateRequest rCP = new CreateRequest.Builder()
-                .roleOnly("admin", createReq)
+                .request(createReq)
+                .buildRole("admin")
                 .build();
-        Response respCP = send(rCP, "/create/supervisor");
-        AssertionsHelper.assertStatusCodeAndContentType(respCP);
+        Response respCP = requestService.send(rCP, "supervisor");
+        AssertionsHelper.assertStatusCodeOKAndContentTypeOK(respCP);
 
         int id = respCP.as(CreateResponse.class).getId();
 
         GetRequest gCP = new GetRequest.Builder()
-                .playerId(id)
+                .buildPlayerId(id)
                 .build();
-        Response respPS = send(gCP, "/get");
-        AssertionsHelper.assertStatusCodeAndContentType(respPS);
+        Response respPS = requestService.send(gCP);
+        AssertionsHelper.assertStatusCodeOKAndContentTypeOK(respPS);
         GetResponse actualResp = respPS.as(GetResponse.class);
-        GetResponse expectedResp = new GetResponse(17, "male", id, "User5", "1234567", "admin","Use3");
+        GetResponse expectedResp = rCP.toGetResponse();
+        expectedResp.setId(respCP.jsonPath().get("id"));
         assertEquals(expectedResp, actualResp, "Fields aren't equal");
     }
 
     @Test
     @DisplayName("Receive user with wrong id")
     @Description("Get of user with wrong id")
-    void getUserNegativeTest(){
+    public void getUserNegativeTest() {
         GetRequest gCP = new GetRequest.Builder()
-                .playerId(123456)
+                .buildPlayerId(123456)
                 .build();
-        Response respPS = send(gCP, "/get");
+        Response respPS = requestService.send(gCP);
         AssertionsHelper.assertStatusCodeBadRequestNegative(respPS);
-    }
 
-    CreateRequest createReq = new CreateRequest.Builder()
-            .age("17")
-            .gender("male")
-            .login("User5")
-            .password("1234567")
-            .screenName("Use3")
-            .build();
+        String responseBody = respPS.asString();
+        Assertions.assertTrue(responseBody.isEmpty(), "Response body should be empty.");
+    }
 }
